@@ -6,12 +6,15 @@ import * as stock from "../stock";
 import * as error from "./error";
 import * as express from "express";
 import { NextFunction } from "connect";
+import { ICreateStockRequest } from "./models";
 
 /**
  * Modulo de seguridad, login/logout, cambio de contraseñas, etc
  */
 export function init(app: Express) {
-
+  app.route("/v1/stock/").post(validateToken, createArticleStock);
+  app.route("/v1/stock/:articleId").get(validateToken, getArticleStock);
+  app.route("/v1/stock/:articleId").put(validateToken, updateArticleStock);
 }
 
 interface IUserSessionRequest extends express.Request {
@@ -39,4 +42,16 @@ function validateToken(req: IUserSessionRequest, res: express.Response, next: Ne
       next();
     })
     .catch(err => error.handle(res, err));
+}
+
+function createArticleStock(req: IUserSessionRequest, res: express.Response) {
+
+}
+
+function getArticleStock(req: IUserSessionRequest, res: express.Response) {
+
+}
+
+function updateArticleStock(req: IUserSessionRequest, res: express.Response) {
+
 }
