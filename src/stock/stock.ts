@@ -8,12 +8,6 @@ import { Stock, IStock } from "./schema";
 
 const conf = env.getConfig(process.env);
 
-interface IGetStockRequest {
-  articleId: string;
-  stock: number;
-  status: "normal" | "low";
-}
-
 interface ICreateStockRequest {
   articleId: string;
   initialStock: number;
@@ -74,6 +68,28 @@ function validateCreateArticleStock(body: ICreateStockRequest): Promise<ICreateS
     return Promise.reject(result);
   }
   return Promise.resolve(body);
+}
+
+interface IGetStockRequest {
+  articleId: string;
+  stock: number;
+  status: "normal" | "low";
+}
+export async function getArticleStock(articleId: string): Promise<IStock> {
+  return new Promise((resolve, reject) => {
+    Stock.findOne({
+      articleId: articleId,
+      enabled: true
+    }, function (err: any, stock: IStock) {
+      if (err) return reject(err);
+
+      if (!stock) {
+        const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
+        reject(result);
+      }
+      resolve(stock);
+    });
+  });
 }
 
 interface IUpdateStockRequest {

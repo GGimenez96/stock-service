@@ -54,7 +54,14 @@ function createArticleStock(req: IUserSessionRequest, res: express.Response) {
 }
 
 function getArticleStock(req: IUserSessionRequest, res: express.Response) {
-
+  const articleId = escape(req.params.articleId);
+  stock.getArticleStock(articleId)
+    .then(stock => {
+      res.json(stock);
+    })
+    .catch(err => {
+      error.handle(res, err);
+    });
 }
 
 function updateArticleStock(req: IUserSessionRequest, res: express.Response) {
