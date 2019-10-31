@@ -6,7 +6,6 @@ import * as stock from "../stock";
 import * as error from "./error";
 import * as express from "express";
 import { NextFunction } from "connect";
-import { ICreateStockRequest } from "./models";
 
 /**
  * Modulo de seguridad, login/logout, cambio de contraseñas, etc
@@ -45,7 +44,13 @@ function validateToken(req: IUserSessionRequest, res: express.Response, next: Ne
 }
 
 function createArticleStock(req: IUserSessionRequest, res: express.Response) {
-
+  stock.createArticleStock(req.body)
+    .then(stock => {
+      res.json(stock);
+    })
+    .catch(err => {
+      error.handle(res, err);
+    });
 }
 
 function getArticleStock(req: IUserSessionRequest, res: express.Response) {

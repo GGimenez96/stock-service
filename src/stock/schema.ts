@@ -7,8 +7,7 @@ import { ObjectID } from "bson";
 const conf = env.getConfig(process.env);
 
 export interface IStock extends Document {
-  stockId: ObjectID;
-  articleId: ObjectID;
+  articleId: string;
   stock: number;
   tempStock: number;
   minStockWarning: number;
@@ -16,18 +15,15 @@ export interface IStock extends Document {
   updated: Date;
   created: Date;
   enabled: Boolean;
+  updateStock: Function;
 }
 
 /**
  * Esquema del stock
  */
 const StockSchema = new Schema({
-  stockId: {
-    type: Schema.Types.ObjectId,
-    required: true
-  },
   articleId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true
   },
   stock: {
