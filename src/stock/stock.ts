@@ -8,12 +8,23 @@ import { Stock, IStock } from "./schema";
 
 const conf = env.getConfig(process.env);
 
+export interface IStockResponse {
+  _id: string;
+  articleId: string;
+  stock: number;
+  minStockWarning: number;
+  status: "normal" | "low";
+  updated: Date;
+  created: Date;
+  enabled: Boolean;
+}
+
 interface ICreateStockRequest {
   articleId: string;
   initialStock: number;
   minStockWarning: number;
 }
-export async function createArticleStock(body: ICreateStockRequest): Promise<IGetStockRequest> {
+export async function createArticleStock(body: ICreateStockRequest): Promise<IStockResponse> {
   try {
     body = await validateCreateArticleStock(body);
 
@@ -30,16 +41,20 @@ export async function createArticleStock(body: ICreateStockRequest): Promise<IGe
     stock.enabled = true;
 
     // Save article stock
-    return new Promise<IGetStockRequest>((resolve, reject) => {
+    return new Promise<IStockResponse>((resolve, reject) => {
       stock.save(function (err: any) {
         if (err) return reject(err);
-
-        const newStock: IGetStockRequest = {
+        const result: IStockResponse = {
+          _id: stock._id,
           articleId: stock.articleId,
-          stock: stock.stock,
-          status: "normal"
+          stock: stock.tempStock,
+          minStockWarning: stock.minStockWarning,
+          status: stock.status,
+          updated: stock.updated,
+          created: stock.created,
+          enabled: stock.enabled,
         };
-        resolve(newStock);
+        resolve(result);
       });
     });
   } catch (err) {
@@ -75,7 +90,7 @@ interface IGetStockRequest {
   stock: number;
   status: "normal" | "low";
 }
-export async function getArticleStock(articleId: string): Promise<IStock> {
+export async function getArticleStock(articleId: string): Promise<IStockResponse> {
   return new Promise((resolve, reject) => {
     Stock.findOne({
       articleId: articleId,
@@ -87,7 +102,17 @@ export async function getArticleStock(articleId: string): Promise<IStock> {
         const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
         reject(result);
       }
-      resolve(stock);
+      const result: IStockResponse = {
+        _id: stock._id,
+        articleId: stock.articleId,
+        stock: stock.tempStock,
+        minStockWarning: stock.minStockWarning,
+        status: stock.status,
+        updated: stock.updated,
+        created: stock.created,
+        enabled: stock.enabled,
+      };
+      resolve(result);
     });
   });
 }
