@@ -2,20 +2,19 @@
 
 import { Document, model, Schema } from "mongoose";
 import * as env from "../server/environment";
-import { ObjectID } from "bson";
 
 const conf = env.getConfig(process.env);
 
 export interface IStock extends Document {
   articleId: string;
   stock: number;
-  tempStock: number;
   minStockWarning: number;
-  status: "normal" | "low";
   updated: Date;
   created: Date;
   enabled: Boolean;
   updateStock: Function;
+  reserveStock: Function;
+  restoreReservedStock: Function;
 }
 
 /**
@@ -30,18 +29,9 @@ const StockSchema = new Schema({
     type: Number,
     required: true
   },
-  tempStock: {
-    type: Number,
-    required: true
-  },
   minStockWarning: {
     type: Number,
     required: true
-  },
-  status: {
-    type: String,
-    required: true,
-    default: "normal"
   },
   updated: {
     type: Date,
@@ -59,6 +49,21 @@ const StockSchema = new Schema({
 
 StockSchema.index({ stockId: 1, enabled: -1 });
 StockSchema.index({ stockId: 1, articleId: 1 });
+
+StockSchema.methods.updateStock = function (action: "increase" | "decrease", amount: number) {
+  switch (action) {
+    case "increase":
+      this.stock += amount;
+      break;
+
+    case "decrease":
+      this.stock -= amount;
+      break;
+
+    default:
+      break;
+  }
+};
 
 /**
  * Trigger antes de guardar

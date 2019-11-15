@@ -13,7 +13,6 @@ export interface IStockResponse {
   articleId: string;
   stock: number;
   minStockWarning: number;
-  status: "normal" | "low";
   updated: Date;
   created: Date;
   enabled: Boolean;
@@ -33,9 +32,7 @@ export async function createArticleStock(body: ICreateStockRequest): Promise<ISt
 
     stock.articleId = body.articleId;
     stock.stock = body.initialStock;
-    stock.tempStock = body.initialStock;
     stock.minStockWarning = body.minStockWarning;
-    stock.status = "normal";
     stock.updated = today;
     stock.created = today;
     stock.enabled = true;
@@ -47,9 +44,8 @@ export async function createArticleStock(body: ICreateStockRequest): Promise<ISt
         const result: IStockResponse = {
           _id: stock._id,
           articleId: stock.articleId,
-          stock: stock.tempStock,
+          stock: stock.stock,
           minStockWarning: stock.minStockWarning,
-          status: stock.status,
           updated: stock.updated,
           created: stock.created,
           enabled: stock.enabled,
@@ -88,7 +84,6 @@ function validateCreateArticleStock(body: ICreateStockRequest): Promise<ICreateS
 interface IGetStockRequest {
   articleId: string;
   stock: number;
-  status: "normal" | "low";
 }
 export async function getArticleStock(articleId: string): Promise<IStockResponse> {
   return new Promise((resolve, reject) => {
@@ -105,9 +100,8 @@ export async function getArticleStock(articleId: string): Promise<IStockResponse
       const result: IStockResponse = {
         _id: stock._id,
         articleId: stock.articleId,
-        stock: stock.tempStock,
+        stock: stock.stock,
         minStockWarning: stock.minStockWarning,
-        status: stock.status,
         updated: stock.updated,
         created: stock.created,
         enabled: stock.enabled,
@@ -120,4 +114,69 @@ export async function getArticleStock(articleId: string): Promise<IStockResponse
 interface IUpdateStockRequest {
   action: "increase" | "decrease";
   amount: number;
+}
+
+export async function updateArticleStock(articleId: string, body: IUpdateStockRequest) {
+  try {
+    body = await validateUpdateArticleStock(body);
+    const action = body.action;
+    const amount = Number(body.amount);
+
+    return new Promise((resolve, reject) => {
+      Stock.findOne({
+        articleId: articleId,
+        enabled: true
+      }, function (err: any, stock: IStock) {
+        if (err) return reject(err);
+
+        if (!stock) {
+          const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
+          reject(result);
+        } else {
+          stock.updateStock(action, amount);
+
+          // Save the Stock
+          stock.save(function (err: any, stock) {
+            if (err) return reject(err);
+
+            const result: IStockResponse = {
+              _id: stock._id,
+              articleId: stock.articleId,
+              stock: stock.stock,
+              minStockWarning: stock.minStockWarning,
+              updated: stock.updated,
+              created: stock.created,
+              enabled: stock.enabled,
+            };
+            resolve(result);
+          });
+        }
+      });
+    });
+  } catch (err) {
+    return Promise.reject(err);
+  }
+}
+
+function validateUpdateArticleStock(body: IUpdateStockRequest): Promise<IUpdateStockRequest> {
+  const result: error.ValidationErrorMessage = {
+    messages: []
+  };
+
+  if (!body.action) {
+    result.messages.push({ path: "action", message: "No puede quedar vacío." });
+  }
+
+  if (body.action !== "increase" && body.action !== "decrease") {
+    result.messages.push({ path: "action", message: "Acción no válida." });
+  }
+
+  if (!body.amount || body.amount <= 0) {
+    result.messages.push({ path: "amount", message: "No puede quedar vacío." });
+  }
+
+  if (result.messages.length > 0) {
+    return Promise.reject(result);
+  }
+  return Promise.resolve(body);
 }
