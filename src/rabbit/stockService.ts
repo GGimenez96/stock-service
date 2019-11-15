@@ -9,8 +9,7 @@ import { IRabbitMessage } from "./tools/common";
 import { Stock, IStock } from "../stock/schema";
 import { IStockResponse } from "../stock";
 import * as error from "../server/error";
-import { RabbitTopicConsumer } from "./tools/topicConsumer";
-import { RabbitFanoutConsumer } from "./tools/fanoutConsumer";
+import * as articleDeleted from "../stock/articleDeleted";
 
 interface ICartUpdatedMessage {
   articleId: string;
@@ -22,6 +21,10 @@ export function init() {
   cart.addProcessor("article-add", processCartArticleAdd);
   cart.addProcessor("article-remove", processCartArticleRemove);
   cart.init();
+
+  const catalog = new RabbitDirectConsumer("articles", "catalog-stock");
+  catalog.addProcessor("article-delete", processCatalogArticleDelete);
+  catalog.init();
 }
 
 function processCartArticleAdd(rabbitMessage: IRabbitMessage) {
@@ -85,4 +88,13 @@ async function processCartMovement(cartMovement: "add" | "remove", articleId: st
   } catch (err) {
     return Promise.reject(err);
   }
+}
+
+interface ICatalogArticleDeletedMessage {
+  articleId: string;
+}
+
+function processCatalogArticleDelete(rabbitMessage: IRabbitMessage) {
+  const deletedArticle: ICatalogArticleDeletedMessage = rabbitMessage.message;
+  articleDeleted.deleteArticleStock(deletedArticle.articleId);
 }
