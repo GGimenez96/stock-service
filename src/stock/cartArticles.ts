@@ -4,7 +4,6 @@ import { Stock, IStock } from "../stock/schema";
 import { IStockResponse } from "../stock";
 import * as error from "../server/error";
 
-
 export async function processCartMovement(cartMovement: "add" | "remove", articleId: string, amount: number) {
   const action = cartMovement === "add" ? "decrease" : "increase";
   try {
@@ -19,7 +18,7 @@ export async function processCartMovement(cartMovement: "add" | "remove", articl
           const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
           reject(result);
         } else {
-          if (stock.stock < amount) {
+          if (stock.stock < amount && action === "decrease") {
             const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid amount");
             return reject(result);
           }
