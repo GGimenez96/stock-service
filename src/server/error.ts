@@ -27,6 +27,17 @@ export function newArgumentError(argument: string, err: string): ValidationError
   };
 }
 
+/**
+ * @apiDefine CustomError
+ *
+ * @apiErrorExample {CODE} Custom Error
+ * HTTP/1.1 {CODE} Custom Error
+ *  {
+ *    "code": {code},
+ *    "error" : "Custom error message"
+ *  }
+ *
+ */
 export function newError(code: number, err: string): ValidationErrorMessage {
   return { code: code, error: err };
 }
@@ -85,6 +96,17 @@ export function logErrors(err: any, req: express.Request, res: express.Response,
 }
 
 
+/**
+ * @apiDefine NotFound
+ *
+ * @apiErrorExample 404 Not Found
+ * HTTP/1.1 404 Not Found
+ *  {
+ *    "url": "{url}",
+ *    "error" : "Not Found"
+ *  }
+ *
+ */
 export function handle404(req: express.Request, res: express.Response) {
   res.status(ERROR_NOT_FOUND);
   res.json({
@@ -94,6 +116,16 @@ export function handle404(req: express.Request, res: express.Response) {
 }
 
 
+/**
+ * @apiDefine UnknownError
+ *
+ * @apiErrorExample 500 Internal Server Error
+ * HTTP/1.1 500 Internal Server Error
+ *  {
+ *    "error" : "{error}"
+ *  }
+ *
+ */
 // Error desconocido
 function sendUnknown(res: express.Response, err: any): ValidationErrorMessage {
   res.status(ERROR_INTERNAL_ERROR);

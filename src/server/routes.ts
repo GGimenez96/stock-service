@@ -54,6 +54,40 @@ function validateArticleStockCreation(req: IUserSessionRequest, res: express.Res
     });
 }
 
+/**
+ * @api {post} /v1/stock/ Crear nuevo stock
+ * @apiName Crear nuevo stock
+ * @apiGroup Stock
+ *
+ * @apiDescription Crear el stock de un nuevo artículo.
+ *
+ * @apiExample {json} Body
+ *    {
+ *      "articleId": "{articleId}",
+ *      "initialStock": {stock},
+ *      "minStockWarning": {minStock}
+ *    }
+ *
+ * @apiSuccessExample {json} Response
+ * HTTP/1.1 200 OK
+ *    {
+ *      "_id": "{newStockId}",
+ *      "articleId": "{articleId}",
+ *      "stock": {stock},
+ *      "minStockWarning": {stock},
+ *      "updated": "{now}",
+ *      "created": "{now}",
+ *      "enabled": true
+ *    }
+ *
+ * @apiUse ParamValidationErrors
+ * @apiUse OtherErrors
+ * @apiUse AuthHeader
+ * @apiUse UnknownError
+ * @apiUse NotFound
+ * @apiUse CustomError
+ *
+ */
 function createArticleStock(req: IUserSessionRequest, res: express.Response) {
   stock.createArticleStock(req.body)
     .then(stock => {
@@ -64,6 +98,32 @@ function createArticleStock(req: IUserSessionRequest, res: express.Response) {
     });
 }
 
+/**
+ * @api {get} /v1/stock/:articleId/ Obtener stock
+ * @apiName Obtener stock
+ * @apiGroup Stock
+ *
+ * @apiDescription Obtener el stock de un artículo.
+ *
+ * @apiSuccessExample {json} Response
+ * HTTP/1.1 200 OK
+ *    {
+ *      "_id": "{newStockId}",
+ *      "articleId": "{articleId}",
+ *      "stock": {stock},
+ *      "minStockWarning": {stock},
+ *      "updated": "{date}",
+ *      "created": "{date}",
+ *      "enabled": true
+ *    }
+ *
+ * @apiUse ParamValidationErrors
+ * @apiUse OtherErrors
+ * @apiUse AuthHeader
+ * @apiUse UnknownError
+ * @apiUse NotFound
+ * @apiUse CustomError
+ */
 function getArticleStock(req: IUserSessionRequest, res: express.Response) {
   const articleId = escape(req.params.articleId);
   stock.getArticleStock(articleId)
@@ -75,6 +135,38 @@ function getArticleStock(req: IUserSessionRequest, res: express.Response) {
     });
 }
 
+/**
+ * @api {put} /v1/stock/:articleId/ Modificar stock
+ * @apiName Modificar stock
+ * @apiGroup Stock
+ *
+ * @apiDescription Modifica el stock de un artículo.
+ *
+ * @apiExample {json} Body
+ *    {
+ *      "action": "decrease" | “increase”,
+ *      "amount": {amount}
+ *    }
+ *
+ * @apiSuccessExample {json} Response
+ * HTTP/1.1 200 OK
+ *    {
+ *      "_id": "{newStockId}",
+ *      "articleId": "{articleId}",
+ *      "stock": {stock},
+ *      "minStockWarning": {stock},
+ *      "updated": "{now}",
+ *      "created": "{now}",
+ *      "enabled": true
+ *    }
+ *
+ * @apiUse ParamValidationErrors
+ * @apiUse OtherErrors
+ * @apiUse AuthHeader
+ * @apiUse UnknownError
+ * @apiUse NotFound
+ * @apiUse CustomError
+ */
 function updateArticleStock(req: IUserSessionRequest, res: express.Response) {
   const articleId = escape(req.params.articleId);
   stock.updateArticleStock(articleId, req.body)
