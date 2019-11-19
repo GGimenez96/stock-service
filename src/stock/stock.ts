@@ -129,6 +129,10 @@ export async function updateArticleStock(articleId: string, body: IUpdateStockRe
           const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
           reject(result);
         } else {
+          if (stock.stock < amount && action === "decrease") {
+            const result = error.newError(error.ERROR_BAD_REQUEST, "Amount can't be greater than available stock");
+            return reject(result);
+          }
           stock.updateStock(action, amount);
 
           // Save the Stock
