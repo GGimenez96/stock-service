@@ -44,7 +44,7 @@ export function init() {
 
 /**
  * @api {direct} cart-stock/stock-update Artículo agregado al carrito
- * @apiName Artículo agregado al carrito
+ * @apiName Articulo agregado al carrito
  * @apiGroup RabbitMQ GET
  *
  * @apiDescription Escucha a Cart para saber cuando se agrega un artículo al carrito y así reservar stock.
@@ -71,7 +71,7 @@ function processCartArticleAdd(rabbitMessage: IRabbitMessage) {
 
 /**
  * @api {direct} cart-stock/stock-update Artículo eliminado del carrito
- * @apiName Artículo eliminado del carrito
+ * @apiName Articulo eliminado del carrito
  * @apiGroup RabbitMQ GET
  *
  * @apiDescription Escucha a Cart para saber cuando se quita un artículo del carrito y así liberar stock.
@@ -98,7 +98,7 @@ function processCartArticleRemove(rabbitMessage: IRabbitMessage) {
 
 /**
  * @api {direct} catalog-stock/articles Artículo eliminado del catálogo
- * @apiName Artículo eliminado del catálogo
+ * @apiName Articulo eliminado del catálogo
  * @apiGroup RabbitMQ GET
  *
  * @apiDescription Escucha a Catalog para eliminar el stock de un artículo cuando este se elimine del catálogo.
