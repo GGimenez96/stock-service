@@ -7,7 +7,7 @@ Este microservicio gestiona el stock de todos los artículos.
 La documentación de las api también se pueden consultar desde el home del microservicio
 que una vez levantado el servidor se puede navegar en [localhost:3007](http://localhost:3007/)
 
-## Dependencias
+## Dependencias
 
 ### Auth
 
@@ -16,21 +16,21 @@ El stock sólo puede usarse por usuario autenticados, ver la arquitectura de mic
 ### Catalog
 
 Funcionalidades relacionadas con el Catálogo:
-    Informar stock de los artículos.
-    Crear stock inicial cuando se cree un artículo.
-    Modificar el stock de los artículos.
-    Eliminar el stock cuando se elimine un artículo.
-    Informar sobre stock bajo.
+- Informar stock de los artículos.
+- Crear stock inicial cuando se cree un artículo.
+- Modificar el stock de los artículos.
+- Eliminar el stock cuando se elimine un artículo.
+- Informar sobre stock bajo.
 
 Los artículos del microservicio de stock se corresponden con los del Catálogo, ver la arquitectura de microservicios de [ecommerce](https://github.com/nmarsollier/ecommerce).
 
 ### Cart
 
-Cuando hay artículos agregados a un carrito, se disminuye el stock temporalmente para asegurar la completitud de esa orden. De la misma forma, si los artículos se quitan de un carrito, el stock vuelve a incrementarse.
+Cuando hay artículos agregados a un carrito, se disminuye el stock para asegurar la completitud de esa orden. De la misma forma, si los artículos se quitan de un carrito, el stock vuelve a incrementarse.
 
 ### Order
 
-Al completarse una orden, se realiza la baja definitiva del stock.
+Al completarse una orden, se informa el stock de los artículos involucrados en la orden y, si corresponde, se emite una alerta sobre aquellos que hayan alcanzado su límite de stock bajo.
 
 ### Node 10.15
 
