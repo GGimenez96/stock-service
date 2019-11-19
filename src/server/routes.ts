@@ -11,7 +11,7 @@ import { NextFunction } from "connect";
  * Modulo de seguridad, login/logout, cambio de contraseñas, etc
  */
 export function init(app: Express) {
-  app.route("/v1/stock/").post(validateToken, createArticleStock);
+  app.route("/v1/stock/").post(validateToken, validateArticleStockCreation, createArticleStock);
   app.route("/v1/stock/:articleId").get(validateToken, getArticleStock);
   app.route("/v1/stock/:articleId").put(validateToken, updateArticleStock);
 }
@@ -41,6 +41,17 @@ function validateToken(req: IUserSessionRequest, res: express.Response, next: Ne
       next();
     })
     .catch(err => error.handle(res, err));
+}
+
+function validateArticleStockCreation(req: IUserSessionRequest, res: express.Response, next: NextFunction) {
+  const auth = req.header("Authorization");
+  stock.validateArticleStockCreation(auth, req.body)
+    .then(_ => {
+      next();
+    })
+    .catch(err => {
+      error.handle(res, err);
+    });
 }
 
 function createArticleStock(req: IUserSessionRequest, res: express.Response) {

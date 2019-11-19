@@ -1,6 +1,5 @@
 "use strict";
 
-import * as async from "async";
 import { RestClient } from "typed-rest-client/RestClient";
 import * as env from "../server/environment";
 import * as error from "../server/error";
@@ -81,6 +80,44 @@ function validateCreateArticleStock(body: ICreateStockRequest): Promise<ICreateS
   return Promise.resolve(body);
 }
 
+interface Article {
+  "_id": string;
+  "name": string;
+  "price": number;
+  "stock": number;
+  "enabled": boolean;
+}
+/** Valida que el stock no exista para evitar duplicados, y si no existe, verifica que sea un artículo existente en el catálogo. */
+export function validateArticleStockCreation(token: string, body: ICreateStockRequest): Promise<Article> {
+  const articleId = body.articleId;
+  return new Promise((resolve, reject) => {
+
+    Stock.findOne({ articleId: articleId }, function (err: any, stock: IStock) {
+      if (err) return reject(err);
+
+      if (stock) {
+        const result = error.newError(error.ERROR_BAD_REQUEST, `Stock already exists for article with id ${articleId}`);
+        return reject(result);
+      } else {
+        const restClient: RestClient = new RestClient("GetArticle", conf.catalogServer);
+        restClient.get<any>("/v1/articles/" + articleId,
+          { additionalHeaders: { "Authorization": token } }).then(
+            (data) => {
+              console.log("Article exists");
+              console.log(data.result);
+              resolve(data.result as Article);
+            }
+          ).catch(
+            () => {
+              console.log("Article does not exist");
+              reject(error.newError(400, `Article with id ${body.articleId} does not exist`));
+            }
+          );
+      }
+    });
+  });
+}
+
 export async function getArticleStock(articleId: string): Promise<IStockResponse> {
   return new Promise((resolve, reject) => {
     Stock.findOne({
@@ -91,7 +128,7 @@ export async function getArticleStock(articleId: string): Promise<IStockResponse
 
       if (!stock) {
         const result = error.newError(error.ERROR_BAD_REQUEST, "Invalid article id");
-        reject(result);
+        return reject(result);
       }
       const result: IStockResponse = {
         _id: stock._id,
