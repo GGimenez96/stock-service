@@ -81,10 +81,6 @@ function validateCreateArticleStock(body: ICreateStockRequest): Promise<ICreateS
   return Promise.resolve(body);
 }
 
-interface IGetStockRequest {
-  articleId: string;
-  stock: number;
-}
 export async function getArticleStock(articleId: string): Promise<IStockResponse> {
   return new Promise((resolve, reject) => {
     Stock.findOne({

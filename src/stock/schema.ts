@@ -1,9 +1,6 @@
 "use strict";
 
 import { Document, model, Schema } from "mongoose";
-import * as env from "../server/environment";
-
-const conf = env.getConfig(process.env);
 
 export interface IStock extends Document {
   articleId: string;
@@ -13,8 +10,6 @@ export interface IStock extends Document {
   created: Date;
   enabled: Boolean;
   updateStock: Function;
-  reserveStock: Function;
-  restoreReservedStock: Function;
 }
 
 /**
